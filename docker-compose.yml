@@ -1,56 +1,72 @@
 x-app: &default-app
   build:
+    # context は、ビルドコンテキストを指定します。"." は現在のディレクトリを指している。
     context: "."
+    # target は、Dockerfile で指定されたビルドターゲット（マルチステージビルドのターゲット）。
     target: "app"
+    # args は、ビルド時に渡す引数（UID、GID、RAILS_ENV、NODE_ENV）
     args:
       - "UID=${UID:-1000}"
       - "GID=${GID:-1000}"
       - "RAILS_ENV=${RAILS_ENV:-production}"
       - "NODE_ENV=${NODE_ENV:-production}"
+  # 依存するサービス（postgres と redis）を指定します。これにより、web サービスは postgres と redis が先に立ち上がってから起動する。 
   depends_on:
     - "postgres"
     - "redis"
+  # 環境変数を .env ファイルから読み込む
   env_file:
     - ".env"
   restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
   stop_grace_period: "3s"
   tty: true
+  # ボリュームを指定します。DOCKER_WEB_VOLUME の値を使ってボリュームをマウントする。
   volumes:
     - "${DOCKER_WEB_VOLUME:-./public:/app/public}"
 
 x-assets: &default-assets
   build:
+    # context は、ビルドコンテキストを指定します。"." は現在のディレクトリを指している。
     context: "."
+    # target は、Dockerfile で指定されたビルドターゲット（マルチステージビルドのターゲット）。
     target: "assets"
+    # args は、ビルド時に渡す引数（UID、GID、RAILS_ENV、NODE_ENV）
     args:
       - "UID=${UID:-1000}"
       - "GID=${GID:-1000}"
       - "RAILS_ENV=${RAILS_ENV:-production}"
       - "NODE_ENV=${NODE_ENV:-production}"
+  # # 環境変数を .env ファイルから読み込む
   env_file:
     - ".env"
   profiles: ["assets"]
   restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
   stop_grace_period: "3s"
   tty: true
+  # ボリュームを指定します。DOCKER_WEB_VOLUME の値を使ってボリュームをマウントする。
   volumes:
     - ".:/app"
 
 services:
+  # PostgreSQL のデータベースサービス。
   postgres:
+    # deploy: リソース制限（CPUやメモリ）を設定する。
     deploy:
       resources:
         limits:
           cpus: "${DOCKER_POSTGRES_CPUS:-0}"
           memory: "${DOCKER_POSTGRES_MEMORY:-0}"
+    # 環境変数で PostgreSQL のユーザー、パスワード、データベース名を設定する。
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      # POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    # 使用する PostgreSQL の Docker イメージ。
     image: "postgres:15.1-bullseye"
     profiles: ["postgres"]
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     stop_grace_period: "3s"
+    # volumes: データ永続化用のボリュームを指定。
     volumes:
       - "postgres:/var/lib/postgresql/data"
 
@@ -68,22 +84,28 @@ services:
       - "redis:/data"
 
   web:
+    # <<: *default-app で、上記で定義した default-app の設定を継承します。
     <<: *default-app
+    # リソース制限を設定します（CPU、メモリ）。
     deploy:
       resources:
         limits:
           cpus: "${DOCKER_WEB_CPUS:-0}"
           memory: "${DOCKER_WEB_MEMORY:-0}"
+    # 健康チェックを設定する。ここでは、curl localhost:8000/up でアプリケーションの正常性をチェックする。
     healthcheck:
       test: "${DOCKER_WEB_HEALTHCHECK_TEST:-curl localhost:8000/up}"
       interval: "60s"
       timeout: "3s"
       start_period: "5s"
       retries: 3
+    # コンテナのポートをホストに公開する。
     ports:
       - "${DOCKER_WEB_PORT_FORWARD:-127.0.0.1:8000}:${PORT:-8000}"
+    # プロファイルに関連付ける。これにより、特定のプロファイルが有効なときにのみサービスが起動する。
     profiles: ["web"]
 
+  # bundle exec sidekiq を実行するバックグラウンドジョブサービス。
   worker:
     <<: *default-app
     command: "bundle exec sidekiq -C config/sidekiq.yml"
@@ -95,6 +117,7 @@ services:
           memory: "${DOCKER_WORKER_MEMORY:-0}"
     profiles: ["worker"]
 
+  # puma を使って WebSocket 通信を処理するサービス。
   cable:
     <<: *default-app
     command: "puma -p 28080 cable/config.ru"
@@ -108,14 +131,17 @@ services:
       - "${DOCKER_CABLE_PORT_FORWARD:-127.0.0.1:28080}:28080"
     profiles: ["cable"]
 
+  # フロントエンドのビルド（yarn build）を実行するサービス。
   js:
     <<: *default-assets
     command: "yarn build"
 
+  # フロントエンドのビルド（yarn build:css）を実行するサービス。
   css:
     <<: *default-assets
     command: "yarn build:css"
 
+# postgres と redis は、データ永続化用のボリュームを定義しています。これにより、コンテナが削除されてもデータが保持される。
 volumes:
   postgres: {}
   redis: {}
