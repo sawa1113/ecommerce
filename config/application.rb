@@ -34,5 +34,14 @@ module Hello
     origins = ENV.fetch("ACTION_CABLE_ALLOWED_REQUEST_ORIGINS") { "http:\/\/localhost*" }.split(",")
     origins.map! { |url| /#{url}/ }
     config.action_cable.allowed_request_origins = origins
+
+    # Customizing Rails Generators
+    # rails g xxx コマンドを実行する際に、自動生成されるファイルの制御を行う。
+    # 毎回コマンドにスキップオプションをつける必要がなくなる。
+    config.generators do |g|
+      g.assets false # assets（CSS, JavaScript ファイル）の作成をスキップ
+      g.skip_routes true # config/routes.rb へのルート追加をスキップ
+      g.test_framework false # g.test_framework false：テストの作成をスキップ
+    end
   end
 end
