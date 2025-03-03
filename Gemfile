@@ -75,5 +75,8 @@ group :test do
   gem "webdrivers"
 end
 
- gem "devise" # 認証機能の実装
- gem "stripe" # Stripeを使った決済処理の実装
+gem "devise" # 認証機能の実装
+gem "stripe" # Stripeを使った決済処理の実装
+gem 'activesupport', '~> 7.0'
+gem 'zeitwerk', '~> 2.6.8'
+gem 'concurrent-ruby', '1.3.4'

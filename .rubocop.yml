@@ -1,0 +1,24 @@
+AllCops:
+  # RuboCop のチェック対象から除外するディレクトリ・ファイル
+  Exclude:
+    - "vendor/**/*" # vendor/ 以下のすべてのファイルを除外
+    - "db/**/*" # データベース関連の db/ フォルダを除外
+    - "bin/*" # 実行ファイルが入る bin/ フォルダを除外
+    - "node_modules/**/*" # フロントエンドの node_modules/ を除外（Rails + Vue.js や React などで使うことがある）
+    - "config/initializers/devise.rb" # Devise（認証ライブラリ）の設定ファイルを除外
+    - "config/environments/*.rb" # 環境設定ファイル（開発・本番環境用）を除外
+    - "Gemfile" # RuboCop のチェックから Gemfile を除外
+    - "Rakefile" # Rake タスクの定義ファイルを除外
+# # frozen_string_literal: true というマジックコメントのないファイルの許可
+Style/FrozenStringLiteralComment:
+  Enabled: false
+# コンパクト記法とネスト記法の両方を許可
+Style/ClassAndModuleChildren:
+  Enabled: false
+# ドキュメントの無い public class を許可
+Style/Documentation:
+  Enabled: false
+# config/routes.rb をブロック行数のチェックから除外
+Metrics/BlockLength:
+  Exclude:
+    - "config/routes.rb"
