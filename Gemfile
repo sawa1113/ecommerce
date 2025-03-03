@@ -48,6 +48,10 @@ gem "sidekiq", "~> 7.0"
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
+  # Rails起動時に次j動的に読み込まれるのを防ぐために「require:false」をオプションで指定する
+  gem "rubocop", require: false # Rubyのコードのコードの品質を向上させるためのツール。(書き方はバラバラになっていないか？ミスはないかを指摘してくれるツール)
+  gem "rubocop-performance", require: false # Rubyコードのパフォーマンスに関する最適化をチェックする。(もっと処理を早くするために無駄な処理を指摘してくれるツール)
+  gem "rubocop-rails", require: false # Rails特有のベストプラクティスに基づいてコードをチェック。(便利な書き方や間違いやすいポイントをチェックしてくれるツール)
 
   # Reduces boot times through caching; required in config/boot.rb
   gem "bootsnap", require: false
@@ -70,3 +74,6 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
+
+ gem "devise" # 認証機能の実装
+ gem "stripe" # Stripeを使った決済処理の実装
