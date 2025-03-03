@@ -1,22 +1,38 @@
+# すべての環境（development, test, production）で共通するデフォルトの設定を &default というアンカーで定義している。
 default: &default
+  # 使用するデータベースの種類（ここでは postgresql）
   adapter: "postgresql"
+  # データの文字エンコーディング（unicode）
   encoding: "unicode"
-  database: "<%= ENV.fetch("POSTGRES_DB") { "hello" } %>"
+  # 接続するデータベース名（環境変数 POSTGRES_DB、デフォルト値 "ecommerce"）
+  database: "<%= ENV.fetch("POSTGRES_DB") { "ecommerce" } %>"
+  # データベースのユーザー名（環境変数 POSTGRES_USER、デフォルト "hello"）
   username: "<%= ENV.fetch("POSTGRES_USER") { "hello" } %>"
+  # データベースのパスワード（環境変数 POSTGRES_PASSWORD、デフォルト "password"）
   password: "<%= ENV.fetch("POSTGRES_PASSWORD") { "password" } %>"
+  # データベースサーバーのホスト名（環境変数 POSTGRES_HOST、デフォルト "postgres"）
   host: "<%= ENV.fetch("POSTGRES_HOST") { "postgres" } %>"
+  # データベースのポート番号（環境変数 POSTGRES_PORT、デフォルト 5432）
   port: "<%= ENV.fetch("POSTGRES_PORT") { 5432 } %>"
   # http://guides.rubyonrails.org/configuring.html#database-pooling
+  # 接続プールの最大数（環境変数 RAILS_MAX_THREADS、デフォルト 5）
   pool: "<%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>"
 
 development:
   <<: *default
-  database: <%= ENV.fetch("POSTGRES_DB") { "hello" } %>_development
+  # OSTGRES_DB が ecommerce なら ecommerce_development になる
+  # 開発用のデータベース
+  database: <%= ENV.fetch("POSTGRES_DB") { "ecommerce" } %>_development
 
 test:
   <<: *default
-  database: <%= ENV.fetch("POSTGRES_DB") { "hello" } %>_test
+  # ecommerce_test というテスト用データベースを利用
+  # Rails のテスト実行時に使うデータベース
+  database: <%= ENV.fetch("POSTGRES_DB") { "ecommerce" } %>_test
 
 production:
   <<: *default
-  database: <%= ENV.fetch("POSTGRES_DB") { "hello" } %>_production
+  # ecommerce_production という本番用データベースを利用
+  # 本番環境でのデータを保存するデータベース
+  # セキュリティ面から、環境変数に POSTGRES_USER, POSTGRES_PASSWORD を設定する必要がある
+  database: <%= ENV.fetch("POSTGRES_DB") { "ecommerce" } %>_production
