@@ -3,7 +3,7 @@ Rails.application.routes.draw do
     sessions: 'admin/sessions'
   }
   devise_for :customers, controllers: {
-    sessions: 'customer/sessions'
+    sessions: 'customer/sessions',
     registrations: 'customer/registrations'
   }
   root to: 'pages#home'
