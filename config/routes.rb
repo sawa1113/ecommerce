@@ -18,6 +18,7 @@ Rails.application.routes.draw do
         patch 'decrease'
       end
     end
+    resources :checkouts, only: %i[create]
   end
 
   get '/up/', to: 'up#index', as: :up
