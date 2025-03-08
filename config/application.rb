@@ -44,6 +44,6 @@ module Hello
       g.test_framework false # g.test_framework false：テストの作成をスキップ
     end
 
-    config.time_zone = "Tokyo"
+    config.time_zone = 'Tokyo'
   end
 end

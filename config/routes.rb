@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     resources :webhooks, only: [:create]
     resources :orders, only: %i[index show] do
       collection do
-        get "success"
+        get 'success'
       end
     end
   end
