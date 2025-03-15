@@ -8,7 +8,7 @@ class Customer < ApplicationRecord
     validates :status
   end
   enum status: {
-    nomal: 0,
+    normal: 0,
     withdrawn: 1,
     banned: 2
   }
