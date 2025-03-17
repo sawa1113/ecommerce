@@ -8,7 +8,7 @@ class Customer < ApplicationRecord
     validates :status
   end
   enum status: {
-    nomal: 0,
+    normal: 0,
     withdrawn: 1,
     banned: 2
   }
@@ -31,5 +31,9 @@ class Customer < ApplicationRecord
         }
       }
     end
+  end
+
+  def active_for_authentication?
+    super && (status == 'normal')
   end
 end
